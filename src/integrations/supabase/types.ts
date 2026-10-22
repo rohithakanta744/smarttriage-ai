@@ -14,13 +14,131 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      triage_members: {
+        Row: {
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "triage_members_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "triage_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      triage_reports: {
+        Row: {
+          created_at: string
+          diagnosis: Json
+          id: string
+          log: string
+          mode: string
+          tags: string[]
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          diagnosis: Json
+          id?: string
+          log: string
+          mode: string
+          tags?: string[]
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          diagnosis?: Json
+          id?: string
+          log?: string
+          mode?: string
+          tags?: string[]
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "triage_reports_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "triage_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      triage_webhooks: {
+        Row: {
+          provider: string
+          url: string
+          workspace_id: string
+        }
+        Insert: {
+          provider: string
+          url: string
+          workspace_id: string
+        }
+        Update: {
+          provider?: string
+          url?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "triage_webhooks_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "triage_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      triage_workspaces: {
+        Row: {
+          created_at: string
+          id: string
+          invite_code: string
+          name: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_code?: string
+          name: string
+          owner_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_code?: string
+          name?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_triage_workspace: {
+        Args: { workspace_name: string }
+        Returns: string
+      }
+      is_triage_member: { Args: { wid: string }; Returns: boolean }
+      join_triage_workspace: { Args: { code: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never

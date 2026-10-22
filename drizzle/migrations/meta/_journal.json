@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792651420502,
+      "tag": "0000_smarttriage_team_workspaces",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792651910184,
+      "tag": "0001_restrict_report_writes",
+      "breakpoints": true
+    }
+  ]
+}

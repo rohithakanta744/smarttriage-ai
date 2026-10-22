@@ -1,59 +1,25 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-
-const inputSchema = z.object({
-  errorLog: z.string().min(1).max(50000),
-  apiBaseUrl: z.string().trim().min(1).max(500),
-});
-
-const diagnosisSchema = z.object({
-  root_cause: z.string(),
-  severity: z.string(),
-  recommended_action: z.string(),
-});
-
-export type Diagnosis = z.infer<typeof diagnosisSchema>;
+import { maskSensitive } from './log-processing';
+import { type Diagnosis } from './diagnosis';
+export { diagnosisSchema, type Diagnosis } from './diagnosis';
 
 export type DiagnoseResult =
   | { ok: true; diagnosis: Diagnosis }
   | { ok: false; error: string };
 
 export const diagnoseLog = createServerFn({ method: "POST" })
-  .validator((data: unknown) => inputSchema.parse(data))
+  .inputValidator((data: unknown) => z.object({ errorLog: z.string().min(1).max(50000) }).parse(data))
   .handler(async ({ data }): Promise<DiagnoseResult> => {
-    const base = data.apiBaseUrl.replace(/\/+$/, "");
-
-    let response: Response;
+    const apiKey = process.env['LOVABLE_API_KEY'];
+    if (!apiKey) return { ok: false, error: 'Hosted AI is not configured. Demo remains available.' };
     try {
-      response = await fetch(`${base}/api/diagnose`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ error_log: data.errorLog }),
-      });
-    } catch {
-      return {
-        ok: false,
-        error:
-          "Backend unreachable. Make sure the Python FastAPI server is running on port 8000.",
-      };
+      const { analyzeHosted } = await import('./hosted-ai.server');
+      return { ok: true, diagnosis: await analyzeHosted(maskSensitive(data.errorLog).text, apiKey) };
+    } catch (error) {
+      const status = error && typeof error === 'object' && 'statusCode' in error ? Number(error.statusCode) : 0;
+      const safeMessage = error && typeof error === 'object' && 'safeMessage' in error && typeof error.safeMessage === 'string' ? error.safeMessage : null;
+      console.error('Hosted diagnosis failed', { status });
+      return { ok: false, error: safeMessage ?? (status === 402 ? 'AI credits are unavailable. Check Plans & credits before trying again.' : status === 403 ? 'AI access is blocked. An administrator must restore access.' : status === 429 ? 'AI is busy. Please wait before trying again.' : 'Hosted AI could not complete this diagnosis. Your log is preserved; check service availability before a fresh request.') };
     }
-
-    if (!response.ok) {
-      const body = await response.text().catch(() => "");
-      return {
-        ok: false,
-        error: `The diagnosis service returned ${response.status}. ${body.slice(0, 300)}`.trim(),
-      };
-    }
-
-    const parsed = diagnosisSchema.safeParse(await response.json().catch(() => null));
-    if (!parsed.success) {
-      return {
-        ok: false,
-        error:
-          "The service responded, but not with the expected fields (root_cause, severity, recommended_action).",
-      };
-    }
-
-    return { ok: true, diagnosis: parsed.data };
   });

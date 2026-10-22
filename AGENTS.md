@@ -11,3 +11,8 @@
 
 - Use the shared SmartTriage AI pulse-path logo for product identity and derive the favicon from the same geometry so branding stays consistent.
 - Keep anonymous diagnosis history and selected mode in browser storage; this preserves privacy and avoids requiring accounts for the internal prototype.
+- Keep ingestion and masking in shared pure utilities with bounded browser gzip reading, so all transfers use consistent privacy rules.
+- Use server functions for hosted AI and authenticated workspace/channel operations; external FastAPI calls run only in browser handlers to make localhost meaningful and avoid server-side arbitrary URL fetching.
+- Enforce team membership through database policies and owner-check webhook configuration before privileged access; webhook secrets never leave server storage.
+- Keep the team guide as a separate content route and maintain reproducible rule tests next to shared logic.
+- Keep diagnosis schemas and field-wise masking in a browser-safe module, separate from server functions, to prevent circular imports and JSON corruption.

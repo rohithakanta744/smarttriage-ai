@@ -1,0 +1,2 @@
+REVOKE INSERT ON public.triage_reports FROM authenticated;
+COMMENT ON TABLE public.triage_reports IS 'Reads and deletes use member RLS; inserts go through authenticated server validation and masking.';

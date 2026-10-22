@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SeverityBadge } from "./SeverityBadge";
 import type { Diagnosis } from "@/lib/diagnose.functions";
+import { buildReport, downloadText, downloadPdf } from '@/lib/reports';
 
 function Card({
   icon,
@@ -67,7 +68,7 @@ export function ResultPanel({
     );
   }
 
-  const report = `SmartTriage AI diagnosis\n\nSeverity: ${diagnosis.severity}\n\nRoot cause:\n${diagnosis.root_cause}\n\nRecommended action:\n${diagnosis.recommended_action}\n\nLog excerpt:\n${log.slice(0, 1000)}`;
+  const report = buildReport(diagnosis, log);
 
   const copyReport = async () => {
     try {
@@ -98,6 +99,8 @@ export function ResultPanel({
         title="Root cause"
         body={diagnosis.root_cause}
       />
+      {diagnosis.confidence !== undefined && <p className="text-xs text-muted-foreground">Model-estimated confidence: {diagnosis.confidence}% · not calibrated</p>}
+      {!!diagnosis.evidence_lines?.length && <p className="font-mono text-xs text-muted-foreground">Evidence · submitted lines {diagnosis.evidence_lines.join(', ')}</p>}
       <div className="flex flex-wrap justify-end gap-2 pt-1">
         <Button variant="outline" size="sm" className="gap-2" onClick={copyReport}>
           <Copy className="size-4" /> Copy report
@@ -105,6 +108,9 @@ export function ResultPanel({
         <Button size="sm" className="gap-2" onClick={openTeams}>
           <ExternalLink className="size-4" /> Open in Teams
         </Button>
+        <Button variant="outline" size="sm" onClick={() => downloadText(report, 'smarttriage-report.md')}>Markdown</Button>
+        <Button variant="outline" size="sm" onClick={() => void downloadPdf(report).catch(() => toast.error('PDF export failed.'))}>PDF</Button>
+        <Button variant="outline" size="sm" onClick={() => downloadText(buildReport(diagnosis, log, true), 'smarttriage-postmortem.md')}>Post-mortem</Button>
       </div>
       <Card
         icon={<ListChecks className="size-3.5" />}

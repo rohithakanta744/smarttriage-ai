@@ -31,7 +31,7 @@ export function LogInput({
 }) {
   return (
     <section className="flex min-h-[60vh] flex-col rounded-lg border border-border bg-card">
-      <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-2.5">
         <span className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
           raw_input.log
         </span>
@@ -56,6 +56,8 @@ export function LogInput({
       </div>
       <Textarea
         value={value}
+        disabled={isPending}
+        aria-label="Production error log"
         onChange={(e) => onChange(e.target.value)}
         spellCheck={false}
         placeholder="Paste raw production error log or JSON alert here..."
