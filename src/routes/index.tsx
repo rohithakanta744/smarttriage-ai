@@ -12,6 +12,8 @@ import { PushConfirmation } from "@/components/PushConfirmation";
 import { IngestionTools } from '@/components/IngestionTools';
 import { BackendHealth } from '@/components/BackendHealth';
 import { TeamWorkspace } from '@/components/TeamWorkspace';
+import { EngineComparison } from '@/components/EngineComparison';
+import { DeliverySetup } from '@/components/DeliverySetup';
 import { Input } from '@/components/ui/input';
 import { extractLog, maskSensitive } from '@/lib/log-processing';
 import { runExternal } from '@/lib/external-backend';
@@ -206,8 +208,10 @@ function Index() {
             log={result?.log ?? prepared}
           />
         </div>
+        <EngineComparison log={prepared} />
         <DiagnosisHistory entries={history} onRestore={restoreHistory} onClear={clearHistory} />
-        <TeamWorkspace diagnosis={result?.diagnosis ?? null} log={maskSensitive(result?.log ?? prepared).text} mode={result?.mode ?? mode} tags={tagInput.split(',').map(t => maskSensitive(t.trim().slice(0,40)).text).filter(Boolean).slice(0,8)} onRestore={restoreHistory} />
+        <DeliverySetup />
+        <details className="mt-6 border-t border-border pt-4"><summary className="cursor-pointer text-sm font-semibold">Team accounts · upcoming / preview setup</summary><p className="mt-2 text-xs text-muted-foreground">Email confirmation stays required. This preview supports workspace setup and direct company webhooks, but delivery needs your company configuration. Device history is never uploaded automatically.</p><TeamWorkspace diagnosis={result?.diagnosis ?? null} log={maskSensitive(result?.log ?? prepared).text} mode={result?.mode ?? mode} tags={tagInput.split(',').map(t => maskSensitive(t.trim().slice(0,40)).text).filter(Boolean).slice(0,8)} onRestore={restoreHistory} /></details>
       </main>
     </div>
   );

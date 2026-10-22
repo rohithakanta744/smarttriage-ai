@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { Button } from "@/components/ui/button";
 import { ApiSettingsDialog } from "./ApiSettingsDialog";
 import { SmartTriageLogo } from "./SmartTriageLogo";
+import { HowToUse } from './HowToUse';
 
 export type DiagnosisMode = "demo" | "backend" | "cloud";
 
@@ -28,6 +29,7 @@ export function Navbar({
           </span>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <HowToUse />
           <div className="flex rounded-md border border-border p-0.5" aria-label="Diagnosis mode">
             <Button variant={mode === 'cloud' ? 'secondary' : 'ghost'} size="sm" className="h-7 gap-1 px-2" onClick={() => onModeChange('cloud')}><Sparkles className="size-3.5" />Hosted AI</Button>
             <Button

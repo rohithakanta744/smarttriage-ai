@@ -16,3 +16,6 @@
 - Enforce team membership through database policies and owner-check webhook configuration before privileged access; webhook secrets never leave server storage.
 - Keep the team guide as a separate content route and maintain reproducible rule tests next to shared logic.
 - Keep diagnosis schemas and field-wise masking in a browser-safe module, separate from server functions, to prevent circular imports and JSON corruption.
+- Keep engine comparison isolated from normal diagnosis history and use one masked input snapshot for both engines, so comparisons are reproducible and never silently substitute demos.
+- Ship the external FastAPI service only as a downloadable source kit; it runs on user-owned hosting and holds its own provider credentials, never project secrets.
+- Keep the visual walkthrough a locally rendered, chapter-based player so explanations remain accessible without video hosting or AI generation costs.
