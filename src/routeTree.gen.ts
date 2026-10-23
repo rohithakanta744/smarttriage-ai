@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GuideRouteImport } from './routes/guide'
+import { Route as ApiIncidentChatRouteImport } from './routes/api/incident-chat'
+import { Route as IncidentsIncidentIdRouteImport } from './routes/incidents.$incidentId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +24,54 @@ const GuideRoute = GuideRouteImport.update({
   path: '/guide',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiIncidentChatRoute = ApiIncidentChatRouteImport.update({
+  id: '/api/incident-chat',
+  path: '/api/incident-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncidentsIncidentIdRoute = IncidentsIncidentIdRouteImport.update({
+  id: '/incidents/$incidentId',
+  path: '/incidents/$incidentId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/guide': typeof GuideRoute
+  '/api/incident-chat': typeof ApiIncidentChatRoute
+  '/incidents/$incidentId': typeof IncidentsIncidentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/guide': typeof GuideRoute
+  '/api/incident-chat': typeof ApiIncidentChatRoute
+  '/incidents/$incidentId': typeof IncidentsIncidentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/guide': typeof GuideRoute
+  '/api/incident-chat': typeof ApiIncidentChatRoute
+  '/incidents/$incidentId': typeof IncidentsIncidentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/guide'
+  fullPaths: '/' | '/guide' | '/api/incident-chat' | '/incidents/$incidentId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/guide'
-  id: '__root__' | '/' | '/guide'
+  to: '/' | '/guide' | '/api/incident-chat' | '/incidents/$incidentId'
+  id:
+    | '__root__'
+    | '/'
+    | '/guide'
+    | '/api/incident-chat'
+    | '/incidents/$incidentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GuideRoute: typeof GuideRoute
+  ApiIncidentChatRoute: typeof ApiIncidentChatRoute
+  IncidentsIncidentIdRoute: typeof IncidentsIncidentIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +90,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuideRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/incident-chat': {
+      id: '/api/incident-chat'
+      path: '/api/incident-chat'
+      fullPath: '/api/incident-chat'
+      preLoaderRoute: typeof ApiIncidentChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/incidents/$incidentId': {
+      id: '/incidents/$incidentId'
+      path: '/incidents/$incidentId'
+      fullPath: '/incidents/$incidentId'
+      preLoaderRoute: typeof IncidentsIncidentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GuideRoute: GuideRoute,
+  ApiIncidentChatRoute: ApiIncidentChatRoute,
+  IncidentsIncidentIdRoute: IncidentsIncidentIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

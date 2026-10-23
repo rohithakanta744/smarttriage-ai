@@ -14,6 +14,8 @@ import { BackendHealth } from '@/components/BackendHealth';
 import { TeamWorkspace } from '@/components/TeamWorkspace';
 import { EngineComparison } from '@/components/EngineComparison';
 import { DeliverySetup } from '@/components/DeliverySetup';
+import { MultiIncident } from '@/components/MultiIncident';
+import { EnterpriseTools } from '@/components/EnterpriseTools';
 import { Input } from '@/components/ui/input';
 import { extractLog, maskSensitive } from '@/lib/log-processing';
 import { runExternal } from '@/lib/external-backend';
@@ -39,7 +41,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const STAGES = ["Analyzing log...", "Reviewing evidence...", "Preparing diagnosis..."];
+const STAGES = ["Preparing log & masking PII...", "Scanning Vector DB for matching incident signatures...", "Synthesizing root cause & actions via LLM..."];
 const STORAGE_KEY = "smarttriage.apiBaseUrl";
 const MODE_KEY = "smarttriage.mode";
 const HISTORY_KEY = "smarttriage.history";
@@ -55,6 +57,7 @@ function Index() {
   const [smart, setSmart] = useState(true);
   const [masked, setMasked] = useState(true);
   const [tagInput, setTagInput] = useState('');
+  const [provider, setProvider] = useState('openai');
   const extracted = extractLog(log, smart);
   const anonymized = maskSensitive(extracted.text);
   const prepared = masked ? anonymized.text : extracted.text;
@@ -86,7 +89,7 @@ function Index() {
         await new Promise((resolve) => setTimeout(resolve, 900));
         return { ok: true as const, diagnosis: diagnoseInDemo(input.errorLog) };
       }
-      return input.mode === 'cloud' ? run({ data: { errorLog: maskSensitive(input.errorLog).text } }) : runExternal(input.errorLog, apiBaseUrl);
+      return input.mode === 'cloud' ? run({ data: { errorLog: maskSensitive(input.errorLog).text } }) : runExternal(input.errorLog, apiBaseUrl, provider);
     },
     onMutate: () => {
       setResult(null);
@@ -187,6 +190,7 @@ function Index() {
           </p>
           <div className="mt-2"><BackendHealth mode={mode} base={apiBaseUrl} /></div>
         </div>
+        {mode === 'backend' && <EnterpriseTools base={apiBaseUrl} provider={provider} onProvider={setProvider} onImport={text => { setLog(text); setResult(null); setError(null); }} />}
         <IngestionTools raw={log} prepared={prepared} numbers={extracted.lineNumbers} maskedCount={anonymized.total} omitted={extracted.omitted} smart={smart} masked={masked} onSmart={setSmart} onMasked={setMasked} onImport={text => { setLog(text); setResult(null); setError(null); }} />
         <Input className="mb-4 max-w-sm" placeholder="Incident tags, comma-separated" aria-label="Incident tags" value={tagInput} maxLength={200} onChange={e => setTagInput(e.target.value)} />
         <div className="grid gap-4 lg:grid-cols-2">
@@ -208,8 +212,9 @@ function Index() {
             log={result?.log ?? prepared}
           />
         </div>
+        <MultiIncident log={prepared} mode={mode} base={apiBaseUrl} provider={provider} />
         <EngineComparison log={prepared} />
-        <DiagnosisHistory entries={history} onRestore={restoreHistory} onClear={clearHistory} />
+        <DiagnosisHistory entries={history} onRestore={restoreHistory} onClear={() => { if (window.confirm('Delete all diagnoses saved in this browser?')) clearHistory(); }} onDelete={id => { setHistory(current => { const next = current.filter(entry => entry.id !== id); try { localStorage.setItem(HISTORY_KEY, JSON.stringify(next)); } catch { toast.error('Could not update browser history.'); } return next; }); }} />
         <DeliverySetup />
         <details className="mt-6 border-t border-border pt-4"><summary className="cursor-pointer text-sm font-semibold">Team accounts · upcoming / preview setup</summary><p className="mt-2 text-xs text-muted-foreground">Email confirmation stays required. This preview supports workspace setup and direct company webhooks, but delivery needs your company configuration. Device history is never uploaded automatically.</p><TeamWorkspace diagnosis={result?.diagnosis ?? null} log={maskSensitive(result?.log ?? prepared).text} mode={result?.mode ?? mode} tags={tagInput.split(',').map(t => maskSensitive(t.trim().slice(0,40)).text).filter(Boolean).slice(0,8)} onRestore={restoreHistory} /></details>
       </main>

@@ -7,8 +7,9 @@ export const diagnosisSchema = z.object({
   recommended_action: z.string().max(16000),
   confidence: z.number().min(0).max(100).optional(),
   evidence_lines: z.array(z.number().int().positive()).max(100).optional(),
+  sources: z.array(z.object({ id: z.string(), source: z.string(), chunk: z.number() })).max(20).optional(),
 });
 export type Diagnosis = z.infer<typeof diagnosisSchema>;
 export function maskDiagnosis(diagnosis: Diagnosis): Diagnosis {
-  return { ...diagnosis, root_cause: maskSensitive(diagnosis.root_cause).text, severity: maskSensitive(diagnosis.severity).text, recommended_action: maskSensitive(diagnosis.recommended_action).text };
+  return { ...diagnosis, root_cause: maskSensitive(diagnosis.root_cause).text, severity: maskSensitive(diagnosis.severity).text, recommended_action: maskSensitive(diagnosis.recommended_action).text, sources: diagnosis.sources?.map(source => ({ ...source, source: maskSensitive(source.source).text })) };
 }

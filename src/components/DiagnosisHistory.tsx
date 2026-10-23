@@ -18,11 +18,13 @@ export function DiagnosisHistory({
   entries,
   onRestore,
   onClear,
+  onDelete,
   scope = 'device',
 }: {
   entries: HistoryEntry[];
   onRestore: (entry: HistoryEntry) => void;
   onClear: () => void;
+  onDelete?: (id: string) => void;
   scope?: 'device'|'team';
 }) {
   const [search, setSearch] = useState('');
@@ -75,6 +77,7 @@ export function DiagnosisHistory({
                 >
                   <RotateCcw className="size-4" />
                 </Button>
+                {onDelete && <Button variant="ghost" size="icon" aria-label="Delete diagnosis" title="Delete diagnosis" onClick={() => { if (window.confirm('Delete this diagnosis?')) onDelete(entry.id); }}><Trash2 className="size-4" /></Button>}
               </div>
             </article>
           ))}

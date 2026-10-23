@@ -35,7 +35,9 @@ export function LogInput({
         <span className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
           raw_input.log
         </span>
-        <div className="flex items-center gap-2">
+        <details className="max-w-full">
+          <summary className="cursor-pointer text-xs text-muted-foreground">Examples & onboarding</summary>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
           <Select value={selectedSample} onValueChange={onSelectedSampleChange}>
             <SelectTrigger className="h-8 w-[170px] text-xs" aria-label="Choose sample incident">
               <SelectValue />
@@ -53,6 +55,7 @@ export function LogInput({
             <span className="hidden sm:inline">Load sample</span>
           </Button>
         </div>
+        </details>
       </div>
       <Textarea
         value={value}
@@ -67,7 +70,7 @@ export function LogInput({
         <span className="font-mono text-xs text-muted-foreground">
           {value.length.toLocaleString()} chars
         </span>
-        <Button onClick={onSubmit} disabled={isPending || !value.trim()} className="gap-2">
+        <Button onClick={onSubmit} disabled={isPending || !value.trim()} className="max-w-full gap-2 whitespace-normal text-left">
           {isPending ? (
             <>
               <Loader2 className="size-4 animate-spin" />

@@ -16,3 +16,11 @@
 - [ ] Verify company Teams/Slack delivery — blocked by no company webhook
 - [x] Document team handoff, technology stack and remaining external dependencies
 - [x] Push verified source to rohithakanta744/smarttriage-ai and show live exact commit in repository confirmation
+## Remaining PRD and enterprise feedback
+- [x] Individual and bulk history deletion, collapsed onboarding examples
+- [x] Multi-error scanning and per-incident investigation threads
+- [x] FastAPI LangChain/Chroma RAG, runbook uploads and citations
+- [x] Provider selection with OpenAI/Azure and honest Copilot capability
+- [x] Grafana Loki query and authenticated alert ingestion
+- [x] Update walkthrough/guide, test and refresh downloadable kit
+- [ ] Push final source to the requested GitHub repository

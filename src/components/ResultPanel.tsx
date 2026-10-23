@@ -101,6 +101,7 @@ export function ResultPanel({
       />
       {diagnosis.confidence !== undefined && <p className="text-xs text-muted-foreground">Model-estimated confidence: {diagnosis.confidence}% · not calibrated</p>}
       {!!diagnosis.evidence_lines?.length && <p className="font-mono text-xs text-muted-foreground">Evidence · submitted lines {diagnosis.evidence_lines.join(', ')}</p>}
+      {!!diagnosis.sources?.length && <div className="text-xs text-muted-foreground"><p className="font-semibold">Retrieved runbooks</p>{diagnosis.sources.map((source,i) => <p key={`${source.id}-${source.chunk}`}>[{i+1}] {source.source} · chunk {source.chunk}</p>)}</div>}
       <div className="flex flex-wrap justify-end gap-2 pt-1">
         <Button variant="outline" size="sm" className="gap-2" onClick={copyReport}>
           <Copy className="size-4" /> Copy report
